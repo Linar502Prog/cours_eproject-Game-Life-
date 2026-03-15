@@ -6,25 +6,25 @@
 int main() {
 	setlocale(LC_ALL, "RUS");
 	int rows{}, columns{};
-	std::ifstream file("курсач.txt");
+	std::ifstream file("РљСѓСЂСЃР°С‡1.txt");
 	if (file.is_open()) {
 		file >> rows;
 		file >> columns;
-		//создание массивов
-		std::string** old_arr = new std::string * [rows];
-		std::string** new_arr = new std::string * [rows];
+		//СЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІРѕРІ
+		char** old_arr = new char* [rows];
+		char** new_arr = new char* [rows];
 		for (size_t i = 0; i < rows; i++) {
-			old_arr[i] = new std::string[columns];//создание массива, который будет хранить предыдущую генерацию
-			new_arr[i] = new std::string[columns];//создание массива, который будет хранить новую генерацию
+			old_arr[i] = new char[columns];//СЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР°, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊ РїСЂРµРґС‹РґСѓС‰СѓСЋ РіРµРЅРµСЂР°С†РёСЋ
+			new_arr[i] = new char[columns];//СЃРѕР·РґР°РЅРёРµ РјР°СЃСЃРёРІР°, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊ РЅРѕРІСѓСЋ РіРµРЅРµСЂР°С†РёСЋ
 			for (size_t j = 0; j < columns; j++) {
-				new_arr[i][j] = "-";
-				old_arr[i][j] = "-";
+				new_arr[i][j] = '-';
+				old_arr[i][j] = '-';
 			}
 		}
 		int file_i{}, file_j{}, count{}, generous{};
 		while (file >> file_i >> file_j) {
-			new_arr[file_i][file_j] = "*";
-			old_arr[file_i][file_j] = "*";
+			new_arr[file_i][file_j] = '*';
+			old_arr[file_i][file_j] = '*';
 			count += 1;
 		}
 		file.close();
@@ -38,213 +38,42 @@ int main() {
 		std::cout << "Generation: " << generous << ". " << "Active cells: " << count << std::endl;
 		Sleep(2000);
 		std::system("cls");
-		//вторая и последующая генерация
+		//РІС‚РѕСЂР°СЏ Рё РїРѕСЃР»РµРґСѓСЋС‰Р°СЏ РіРµРЅРµСЂР°С†РёСЏ
 		while (count != 0) {
 			for (size_t i = 0; i < rows; i++) {
 				for (size_t j = 0; j < columns; j++) {
-					int countAliveCells{0};//сколько рядом живых
-					if (old_arr[i][j] == "*") {
-						countAliveCells = -1;
-					}
-				//4 крайние точки
-					//точка (0;0)
-					if (i == 0 && j == 0) {
-						for (size_t k = i; k < i + 2; k++) {
-							for (size_t l = j; l < j + 2; l++) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
+					int countAliveCells{ 0 };//СЃРєРѕР»СЊРєРѕ СЂСЏРґРѕРј Р¶РёРІС‹С…
+					for (int k=-1; k < 2; k++) {
+						for (int l = -1; l < 2; l++) {
+							if (k==0 && l==0) {
+								continue;
+							}
+							int neighbour_i = i + k;
+							int neighbour_j = j + l;
+							if ((neighbour_i >= 0 && neighbour_i < rows) && (neighbour_j >= 0 && neighbour_j < columns)) {
+								if (old_arr[neighbour_i][neighbour_j] == '*') {
+									countAliveCells +=1;
 								}
 							}
 						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells > 3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
+					}
+					if (old_arr[i][j] == '*') {
+						if (countAliveCells < 2 || countAliveCells > 3) {
+							new_arr[i][j] = '-';
 						}
 					}
-					//точка (rows-1:0)
-					else if (i == rows - 1 && j == 0) {
-						for (int k = i; k > i - 2; k--) {
-							for (size_t l = j; l < j + 2; l++) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells > 3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
+					else if (old_arr[i][j] == '-') {
+						if (countAliveCells == 3) {
+							new_arr[i][j] = '*';
 						}
 					}
-					//точка (0:columns-1)
-					else if (i == 0 && j == columns - 1) {
-						for (size_t k = i; k < i + 2; k++) {
-							for (int l = j; l > j - 2; l--) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells > 3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
-						}
-					}
-					//точка (rows-1:columns-1)
-					else if (i == rows - 1 && j == columns - 1) {
-						for (int k = i; k > i - 2; k--) {
-							for (int l = j; l > j - 2; l--) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells > 3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
-						}
-					}
-				//5 соседей 
-					//левая стенка
-					if (i > 0 && i < rows - 1 && j == 0) {
-						for (size_t k = i - 1; k < i + 2; k++) {
-							for (size_t l = j; l < j + 2; l++) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells>3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
-						}
-					}
-					//верхняя стенка
-					else if (i == 0 && j > 0 && j < columns - 1) {
-						for (size_t k = i; k < i + 2; k++) {
-							for (size_t l = j - 1; l < j + 2; l++) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells >3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
-						}
-					}
-					//нижняя стенка
-					else if (i == rows - 1 && j > 0 && j < columns - 1) {
-						for (int k = i; k > i - 2; k--) {
-							for (size_t l = j-1; l < j + 2; l++) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells>3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
-						}
-					}
-					//правая стенка
-					else if (i > 0 && i < rows - 1 && j == columns - 1) {
-						for (size_t k = i - 1; k < i + 2; k++) {
-							for (int l = j; l > j - 2; l--) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells >3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
-						}
-					}
-					//когда 8 соседей
-					if ((i > 0 && (i < rows - 1)) && (j>0 && (j < columns - 1))) {
-						for (size_t k = i - 1; k < i + 2; k++) {
-							for (size_t l = j - 1; l < j + 2; l++) {
-								if (old_arr[k][l] == "*") {
-									countAliveCells += 1;
-								}
-							}
-						}
-						if (old_arr[i][j] == "*") {
-							if (countAliveCells < 2 || countAliveCells>3) {
-								new_arr[i][j] = "-";
-								count -= 1;
-							}
-						}
-						else if (old_arr[i][j] == "-") {
-							if (countAliveCells == 3) {
-								new_arr[i][j] = "*";
-								count += 1;
-							}
-						}
+				}
+			}	
+			count = 0;
+			for (size_t i = 0; i < rows; i++) {
+				for (size_t j = 0; j < columns; j++) {
+					if (new_arr[i][j] == '*') {
+						count++;
 					}
 				}
 			}
@@ -284,9 +113,15 @@ int main() {
 			Sleep(2000);
 			std::system("cls");
 		}
+		for (size_t i = 0; i < rows; i++) {
+			delete[] old_arr[i];
+			delete[] new_arr[i];
+		}
+		delete[] old_arr;
+		delete[] new_arr;
 	}
 	else {
-		std::cout << "Файл не наден " << std::endl;
+		std::cout << "Р¤Р°Р№Р» РЅРµ РЅР°РґРµРЅ " << std::endl;
 	}
 	return EXIT_SUCCESS;
 }
